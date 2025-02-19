@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat - Client & Appel Audio</title>
+  <link rel="stylesheet" href="index.css">
+  <script type="module" src="societe.js" defer></script>
+</head>
+<body>
+  <div class="chat-container">
+    <header class="chat-header">
+      💬 Chat Privé
+      <span id="connection-status"></span>
+    </header>
+
+    <!-- Zone d'affichage des messages du chat -->
+    <main id="chat-box" class="chat-box"></main>
+
+    <!-- Zone d'envoi des messages texte et d'images -->
+    <section class="input-container">
+      <input type="text" id="chat-input" placeholder="Écrire un message..." aria-label="Entrer un message">
+      <button id="send-btn" aria-label="Envoyer le message">➤</button>
+      <label for="image-input" class="image-label" aria-label="Envoyer une image">📷</label>
+      <input type="file" id="image-input" accept="image/*" hidden>
+    </section>
+
+    <!-- Zone d'enregistrement et d'envoi des messages audio -->
+    <section class="audio-container">
+      <h3>🎤 Chat Audio</h3>
+      <button id="record-btn" aria-label="Enregistrer un message audio">🎙️ Enregistrer</button>
+      <button id="stop-btn" disabled aria-label="Arrêter l'enregistrement">⏹️ Arrêter</button>
+      <div id="audio-messages"></div>
+    </section>
+
+    <!-- Zone d'appel audio via WebRTC (appel et réponse) -->
+    <section class="call-container">
+      <h3>📞 Appel Audio</h3>
+      <div id="call-info" class="connection-info" style="display: none; background-color: #e8f5e9; border-radius: 5px; padding: 10px; margin: 10px 0; font-size: 0.9rem;">
+        ID d'appel: <span id="current-call-id"></span>
+        <button id="copy-call-id" style="background-color: #4a69bd; color: white; border: none; padding: 5px 10px; border-radius: 15px; cursor: pointer; font-size: 0.8rem; margin-left: 10px;">📋 Copier</button>
+      </div>
+      <button id="call-btn" aria-label="Passer un appel">📲 Appeler</button>
+      <button id="answer-btn" aria-label="Répondre à l'appel">✅ Répondre</button>
+      <button id="hangup-btn" disabled aria-label="Terminer l'appel">❌ Terminer</button>
+      <audio id="remote-audio" controls autoplay></audio>
+    </section>
+  </div>
+
+  <footer class="footer">
+    <p>&copy; 2025 ABDELOUAHAD ECH CHAABA. Tous droits réservés.</p>
+    <p>Développé par <strong>ABDELOUAHAD ECH CHAABA</strong></p>
+  </footer>
+
+  <script>
+    // Script pour copier l'ID d'appel
+    document.getElementById('copy-call-id')?.addEventListener('click', function() {
+      const callIdElement = document.getElementById('current-call-id');
+      if (callIdElement) {
+        navigator.clipboard.writeText(callIdElement.textContent)
+          .then(() => {
+            alert('ID d\'appel copié dans le presse-papier!');
+          })
+          .catch(err => {
+            console.error('Erreur lors de la copie:', err);
+          });
+      }
+    });
+
+    // Cette fonction sera appelée depuis societe.js
+    window.updateCallDisplay = function(callId, status) {
+      const callInfo = document.getElementById('call-info');
+      const statusIndicator = document.getElementById('connection-status');
+      
+      if (callId && (status === 'waiting' || status === 'connected')) {
+        document.getElementById('current-call-id').textContent = callId;
+        callInfo.style.display = 'block';
+        
+        if (status === 'connected') {
+          statusIndicator.innerHTML = '<span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #4CAF50; margin-left: 10px;"></span>';
+        } else {
+          statusIndicator.innerHTML = '<span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #FFC107; margin-left: 10px; animation: blink 1s infinite;"></span>';
+        }
+      } else {
+        callInfo.style.display = 'none';
+        statusIndicator.innerHTML = '';
+      }
+    };
+  </script>
+  
+  <style>
+    @keyframes blink {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+  </style>
+</body>
+</html>

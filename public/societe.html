@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat - Société</title>
+    <link rel="stylesheet" href="index.css">
+    <script type="module" src="societe.js" defer></script>
+</head>
+<body>
+    <h1>💬 Chat avec Client</h1>
+
+    <!-- Chat Texte -->
+    <div class="chat-container">
+        <div id="chat-box"></div>
+        <input type="text" id="chat-input" placeholder="Écrire un message...">
+        <button id="send-btn">Envoyer</button>
+        <input type="file" id="image-input" accept="image/*">
+    </div>
+
+    <!-- Chat Audio -->
+    <h3>🎤 Chat Audio</h3>
+    <button id="record-btn">🎙️ Enregistrer</button>
+    <button id="stop-btn" disabled>⏹️ Arrêter</button>
+    <div id="audio-messages"></div>
+
+    <!-- Appel Audio -->
+    <h3>📞 Appel Audio</h3>
+    <button id="call-btn">📲 Appeler</button>
+    <button id="answer-btn">✅ Répondre</button>
+    <audio id="remote-audio" controls autoplay></audio>
+
+</body>
+</html>
