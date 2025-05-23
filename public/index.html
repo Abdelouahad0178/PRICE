@@ -3,54 +3,77 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat - Client & Appel Audio</title>
+  <title>WhatsApp Web - Chat</title>
   <link rel="stylesheet" href="index.css">
+  <link rel="icon" type="image/png" href="./favicon.png">
+  <link rel="manifest" href="manifest.json">
   <script type="module" src="societe.js" defer></script>
 </head>
 <body>
-  <div class="chat-container">
-    <header class="chat-header">
-      💬 Chat Privé
-      <span id="connection-status"></span>
-    </header>
-
-    <!-- Zone d'affichage des messages du chat -->
-    <main id="chat-box" class="chat-box"></main>
-
-    <!-- Zone d'envoi des messages texte et d'images -->
-    <section class="input-container">
-      <input type="text" id="chat-input" placeholder="Écrire un message..." aria-label="Entrer un message">
-      <button id="send-btn" aria-label="Envoyer le message">➤</button>
-      <label for="image-input" class="image-label" aria-label="Envoyer une image">📷</label>
-      <input type="file" id="image-input" accept="image/*" hidden>
-    </section>
-
-    <!-- Zone d'enregistrement et d'envoi des messages audio -->
-    <section class="audio-container">
-      <h3>🎤 Chat Audio</h3>
-      <button id="record-btn" aria-label="Enregistrer un message audio">🎙️ Enregistrer</button>
-      <button id="stop-btn" disabled aria-label="Arrêter l'enregistrement">⏹️ Arrêter</button>
-      <div id="audio-messages"></div>
-    </section>
-
-    <!-- Zone d'appel audio via WebRTC (appel et réponse) -->
-    <section class="call-container">
-      <h3>📞 Appel Audio</h3>
-      <div id="call-info" class="connection-info" style="display: none; background-color: #e8f5e9; border-radius: 5px; padding: 10px; margin: 10px 0; font-size: 0.9rem;">
-        ID d'appel: <span id="current-call-id"></span>
-        <button id="copy-call-id" style="background-color: #4a69bd; color: white; border: none; padding: 5px 10px; border-radius: 15px; cursor: pointer; font-size: 0.8rem; margin-left: 10px;">📋 Copier</button>
-      </div>
-      <button id="call-btn" aria-label="Passer un appel">📲 Appeler</button>
-      <button id="answer-btn" aria-label="Répondre à l'appel">✅ Répondre</button>
-      <button id="hangup-btn" disabled aria-label="Terminer l'appel">❌ Terminer</button>
-      <audio id="remote-audio" controls autoplay></audio>
-    </section>
+  <!-- Titre Publicitaire -->
+  <div id="publicite" class="publicite">
+    <h1>🟢 WhatsApp Web</h1>
+    <p>Restez connecté avec vos proches où que vous soyez !</p>
+    <button id="fermer-publicite" aria-label="Fermer la publicité">Commencer</button>
   </div>
 
-  <footer class="footer">
-    <p>&copy; 2025 ABDELOUAHAD ECH CHAABA. Tous droits réservés.</p>
-    <p>Développé par <strong>ABDELOUAHAD ECH CHAABA</strong></p>
-  </footer>
+  <!-- Container principal WhatsApp -->
+  <div class="chat-container">
+    <!-- Page d'accueil : Liste des contacts (Sidebar) -->
+    <div id="contacts-page">
+      <section class="contacts-container">
+        <h3>💬 Discussions</h3>
+        <div id="phone-list">
+          <!-- Les contacts (groupés) seront générés dynamiquement -->
+        </div>
+      </section>
+    </div>
+
+    <!-- Page de chat privé -->
+    <div id="chat-page" style="display: none;">
+      <div class="chat-area">
+        <header class="chat-header">
+          💬 Discussion
+          <span id="connection-status"></span>
+          <!-- Le numéro, le nom et d'autres informations seront ajoutés par societe.js -->
+        </header>
+        
+        <!-- Zone d'affichage des messages du chat -->
+        <main id="chat-box" class="chat-box"></main>
+
+        <!-- Zone d'envoi des messages texte, images et vidéos -->
+        <section class="input-container">
+          <label for="image-input" class="image-label" aria-label="Envoyer une image">📷</label>
+          <input type="file" id="image-input" accept="image/*" hidden>
+          <label for="video-input" class="video-label" aria-label="Envoyer une vidéo">📹</label>
+          <input type="file" id="video-input" accept="video/*" hidden>
+          <input type="text" id="chat-input" placeholder="Tapez un message..." aria-label="Entrer un message">
+          <button id="send-btn" aria-label="Envoyer le message">➤</button>
+        </section>
+
+        <!-- Zone d'enregistrement et d'envoi des messages audio -->
+        <section class="audio-container">
+          <h3>🎤 Message vocal</h3>
+          <button id="record-btn" aria-label="Enregistrer un message audio">🎙️ Enregistrer</button>
+          <button id="stop-btn" disabled aria-label="Arrêter l'enregistrement">⏹️ Arrêter</button>
+          <div id="audio-messages"></div>
+        </section>
+
+        <!-- Zone d'appel audio via WebRTC (appel et réponse) -->
+        <section class="call-container">
+          <h3>📞 Appel vocal</h3>
+          <div id="call-info" class="connection-info" style="display: none;">
+            ID d'appel: <span id="current-call-id"></span>
+            <button id="copy-call-id">📋 Copier</button>
+          </div>
+          <button id="call-btn" aria-label="Passer un appel">📲 Appeler</button>
+          <button id="answer-btn" aria-label="Répondre à l'appel">✅ Répondre</button>
+          <button id="hangup-btn" disabled aria-label="Terminer l'appel">❌ Terminer</button>
+          <audio id="remote-audio" controls autoplay></audio>
+        </section>
+      </div>
+    </div>
+  </div>
 
   <script>
     // Script pour copier l'ID d'appel
@@ -59,7 +82,23 @@
       if (callIdElement) {
         navigator.clipboard.writeText(callIdElement.textContent)
           .then(() => {
-            alert('ID d\'appel copié dans le presse-papier!');
+            // Notification style WhatsApp
+            const notification = document.createElement('div');
+            notification.textContent = 'ID copié !';
+            notification.style.cssText = `
+              position: fixed;
+              top: 20px;
+              right: 20px;
+              background: #25d366;
+              color: white;
+              padding: 8px 16px;
+              border-radius: 20px;
+              font-size: 14px;
+              z-index: 1000;
+              animation: slideIn 0.3s ease;
+            `;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 2000);
           })
           .catch(err => {
             console.error('Erreur lors de la copie:', err);
@@ -67,7 +106,7 @@
       }
     });
 
-    // Cette fonction sera appelée depuis societe.js
+    // Cette fonction sera appelée depuis societe.js pour mettre à jour l'affichage de l'appel
     window.updateCallDisplay = function(callId, status) {
       const callInfo = document.getElementById('call-info');
       const statusIndicator = document.getElementById('connection-status');
@@ -77,23 +116,52 @@
         callInfo.style.display = 'block';
         
         if (status === 'connected') {
-          statusIndicator.innerHTML = '<span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #4CAF50; margin-left: 10px;"></span>';
+          statusIndicator.innerHTML = '<span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #25d366; margin-left: 8px;"></span>';
         } else {
-          statusIndicator.innerHTML = '<span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #FFC107; margin-left: 10px; animation: blink 1s infinite;"></span>';
+          statusIndicator.innerHTML = '<span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #FFC107; margin-left: 8px; animation: blink 1s infinite;"></span>';
         }
       } else {
         callInfo.style.display = 'none';
         statusIndicator.innerHTML = '';
       }
     };
-  </script>
-  
-  <style>
-    @keyframes blink {
-      0% { opacity: 1; }
-      50% { opacity: 0.5; }
-      100% { opacity: 1; }
+
+    // Enregistrement du Service Worker pour la PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(registration => {
+          console.log('Service Worker enregistré avec succès:', registration.scope);
+        })
+        .catch(error => {
+          console.error("L'enregistrement du Service Worker a échoué:", error);
+        });
     }
-  </style>
+
+    // Script pour fermer la publicité
+    document.getElementById('fermer-publicite').addEventListener('click', function() {
+      document.getElementById('publicite').style.display = 'none';
+    });
+
+    // Animation pour les notifications
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      
+      /* Responsive pour mobile */
+      @media (max-width: 768px) {
+        #contacts-page:not(.hidden) ~ #chat-page {
+          display: none;
+        }
+        
+        #chat-page.active ~ #contacts-page {
+          display: none;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
 </body>
 </html>
