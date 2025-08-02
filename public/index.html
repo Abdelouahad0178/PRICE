@@ -3,29 +3,132 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WhatsApp Web - Chat</title>
+  <meta name="description" content="WhatsApp Web - Restez connecté avec vos proches">
+  <meta name="keywords" content="whatsapp, chat, messages, appels">
+  <meta name="author" content="WhatsApp Enhanced">
+  
+  <title>WhatsApp Web - Chat & Appels</title>
+  
   <link rel="icon" type="image/png" href="./favicon.png">
   <link rel="manifest" href="manifest.json">
-  <script type="module" src="societe.js" defer></script>
+  <link rel="apple-touch-icon" href="./favicon.png">
+  
+  <!-- Preload fonts for better performance -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
   <style>
+    /* ===================== CSS INTÉGRÉ OPTIMISÉ ===================== */
+    
+    :root {
+      --primary-color: #25d366;
+      --primary-dark: #128c7e;
+      --background-dark: #111b21;
+      --background-chat: #0b141a;
+      --background-secondary: #202c33;
+      --background-tertiary: #2a3942;
+      --text-primary: #e9edef;
+      --text-secondary: #8696a0;
+      --border-color: #3b4a54;
+      --danger-color: #e53e3e;
+      --warning-color: #ffc107;
+      --success-color: #25d366;
+      --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.15);
+      --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.2);
+      --shadow-heavy: 0 8px 32px rgba(0, 0, 0, 0.3);
+      --border-radius: 12px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
     body {
-      background-color: #111b21;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      color: #e9edef;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--background-dark);
+      color: var(--text-primary);
+      overflow: hidden;
+      line-height: 1.5;
+      user-select: none;
     }
 
-    /* Interface d'appel overlay */
+    /* ===================== SPLASH SCREEN ===================== */
+    
+    .splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #128c7e, #25d366);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      z-index: 3000;
+      transition: opacity 0.5s ease-out;
+    }
+
+    .splash-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .splash-logo {
+      width: 120px;
+      height: 120px;
+      background: white;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 60px;
+      margin-bottom: 30px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      animation: logoFloat 2s ease-in-out infinite;
+    }
+
+    @keyframes logoFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .splash-text {
+      font-size: 28px;
+      font-weight: 300;
+      margin-bottom: 15px;
+    }
+
+    .splash-subtitle {
+      font-size: 16px;
+      opacity: 0.8;
+      margin-bottom: 40px;
+    }
+
+    .splash-button {
+      background: white;
+      color: #128c7e;
+      border: none;
+      padding: 15px 40px;
+      font-size: 16px;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .splash-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+    }
+
+    /* ===================== INTERFACE D'APPEL ===================== */
+    
     .call-overlay {
       position: fixed;
       top: 0;
@@ -37,29 +140,49 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      z-index: 1000;
+      z-index: 2000;
       color: white;
     }
 
     .call-overlay.active {
       display: flex;
+      animation: slideInFromBottom 0.4s ease-out;
+    }
+
+    @keyframes slideInFromBottom {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .call-duration {
+      position: absolute;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 20px;
+      font-weight: 300;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 10px 20px;
+      border-radius: 25px;
+      backdrop-filter: blur(10px);
     }
 
     .call-header {
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 50px;
     }
 
     .call-status {
       font-size: 18px;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
       opacity: 0.9;
+      animation: pulse 2s infinite;
     }
 
     .call-contact-name {
-      font-size: 32px;
+      font-size: 36px;
       font-weight: 300;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
     .call-contact-number {
@@ -68,235 +191,340 @@
     }
 
     .call-avatar-large {
-      width: 200px;
-      height: 200px;
+      width: 220px;
+      height: 220px;
       border-radius: 50%;
       background: linear-gradient(135deg, #667eea, #764ba2);
       display: flex;
       align-items: center;
       justify-content: center;
       color: white;
-      font-size: 80px;
+      font-size: 90px;
       font-weight: bold;
-      margin-bottom: 50px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      margin-bottom: 60px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
       animation: callPulse 2s infinite;
     }
 
     @keyframes callPulse {
-      0% { transform: scale(1); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); }
-      50% { transform: scale(1.05); box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4); }
-      100% { transform: scale(1); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); }
+      0% { transform: scale(1); box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4); }
+      50% { transform: scale(1.05); box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5); }
+      100% { transform: scale(1); box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4); }
     }
 
     .call-controls {
       display: flex;
-      gap: 40px;
+      gap: 50px;
       align-items: center;
     }
 
     .call-btn-large {
-      width: 70px;
-      height: 70px;
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
       border: none;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 28px;
-      transition: all 0.3s ease;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      font-size: 32px;
+      transition: var(--transition);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     }
 
     .call-btn-answer {
-      background: linear-gradient(135deg, #25d366, #128c7e);
+      background: linear-gradient(135deg, var(--success-color), var(--primary-dark));
       color: white;
     }
 
     .call-btn-answer:hover {
-      transform: scale(1.1);
-      box-shadow: 0 12px 32px rgba(37, 211, 102, 0.4);
+      transform: scale(1.15);
+      box-shadow: 0 15px 40px rgba(37, 211, 102, 0.5);
     }
 
     .call-btn-decline {
-      background: linear-gradient(135deg, #e53e3e, #c53030);
+      background: linear-gradient(135deg, var(--danger-color), #c53030);
       color: white;
     }
 
     .call-btn-decline:hover {
-      transform: scale(1.1);
-      box-shadow: 0 12px 32px rgba(229, 62, 62, 0.4);
+      transform: scale(1.15);
+      box-shadow: 0 15px 40px rgba(229, 62, 62, 0.5);
     }
 
-    .call-duration {
-      position: absolute;
-      top: 50px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 18px;
-      font-weight: 300;
-    }
-
-    /* Container principal avec layout WhatsApp */
+    /* ===================== CONTAINER PRINCIPAL ===================== */
+    
     .chat-container {
       width: 100%;
-      max-width: 1200px;
-      height: 95vh;
+      max-width: 1400px;
+      height: 100vh;
       display: flex;
-      background-color: #202c33;
-      border-radius: 8px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      background: var(--background-secondary);
+      border-radius: 0;
+      overflow: hidden;
+      box-shadow: var(--shadow-heavy);
+      margin: 0 auto;
+    }
+
+    /* ===================== SIDEBAR CONTACTS ===================== */
+    
+    #contacts-page {
+      width: 420px;
+      background: var(--background-dark);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      transition: var(--transition);
+    }
+
+    .contacts-header {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      color: white;
+      padding: 25px;
+      font-size: 20px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      box-shadow: var(--shadow-medium);
+      position: relative;
       overflow: hidden;
     }
 
-    /* Page des contacts (sidebar WhatsApp) */
-    #contacts-page {
-      width: 400px;
-      background-color: #111b21;
-      border-right: 1px solid #2a3942;
-      display: flex;
-      flex-direction: column;
+    .contacts-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, rgba(255,255,255,0.1), transparent);
+      pointer-events: none;
     }
 
-    .contacts-container {
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* Header des contacts */
-    .contacts-container h3 {
-      background: linear-gradient(135deg, #25d366, #128c7e);
-      color: white;
-      padding: 20px;
-      font-size: 18px;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Barre de recherche */
     .search-container {
-      padding: 12px 16px;
-      background-color: #111b21;
+      padding: 20px;
+      background: var(--background-dark);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     .search-box {
-      background-color: #2a3942;
+      background: var(--background-tertiary);
       border-radius: 25px;
-      padding: 12px 16px;
+      padding: 15px 20px;
       display: flex;
       align-items: center;
-      gap: 12px;
-      transition: all 0.3s ease;
+      gap: 15px;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .search-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(37, 211, 102, 0.1), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .search-box:focus-within::before {
+      left: 100%;
     }
 
     .search-box:focus-within {
-      background-color: #3b4a54;
-      box-shadow: 0 0 0 2px rgba(37, 211, 102, 0.3);
+      background: var(--border-color);
+      transform: scale(1.02);
+      box-shadow: 0 0 0 2px rgba(37, 211, 102, 0.4);
     }
 
     .search-box input {
       background: none;
       border: none;
-      color: #e9edef;
-      font-size: 14px;
+      color: var(--text-primary);
+      font-size: 15px;
       width: 100%;
       outline: none;
     }
 
     .search-box input::placeholder {
-      color: #8696a0;
+      color: var(--text-secondary);
     }
 
-    /* Mon numéro */
+    .search-icon {
+      color: var(--text-secondary);
+      font-size: 18px;
+      transition: var(--transition);
+    }
+
+    .search-box:focus-within .search-icon {
+      color: var(--primary-color);
+    }
+
+    /* ===================== PROFIL UTILISATEUR ===================== */
+    
     #my-number {
-      background: linear-gradient(135deg, #2a3942, #202c33);
-      padding: 16px 20px;
-      border-bottom: 1px solid #3b4a54;
-      color: #e9edef;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      position: relative;
-      transition: all 0.3s ease;
-    }
-
-    #my-number:hover {
-      background: linear-gradient(135deg, #3b4a54, #2a3942);
-    }
-
-    #my-number::before {
-      content: '👤';
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #25d366, #128c7e);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 20px;
-      flex-shrink: 0;
-      box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
-    }
-
-    #add-name-btn, #delete-mode-btn {
-      background: rgba(37, 211, 102, 0.1);
-      color: #25d366;
-      border: 1px solid #25d366;
-      border-radius: 20px;
-      width: 35px;
-      height: 35px;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: bold;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-left: auto;
-    }
-
-    #add-name-btn:hover {
-      background: #25d366;
-      color: white;
-      transform: scale(1.1);
-    }
-
-    #delete-mode-btn {
-      background: rgba(229, 62, 62, 0.1);
-      color: #e53e3e;
-      border-color: #e53e3e;
-      margin-left: 8px;
-    }
-
-    #delete-mode-btn:hover {
-      background: #e53e3e;
-      color: white;
-      transform: scale(1.1);
-    }
-
-    /* Liste des contacts magnifique */
-    #phone-list {
-      flex: 1;
-      overflow-y: auto;
-      background-color: #111b21;
-    }
-
-    .contact-item {
-      padding: 16px 20px;
-      border-bottom: 1px solid rgba(42, 57, 66, 0.3);
-      cursor: pointer;
-      transition: all 0.3s ease;
+      background: linear-gradient(135deg, var(--background-tertiary), var(--background-secondary));
+      padding: 20px 25px;
+      border-bottom: 1px solid var(--border-color);
       display: flex;
       align-items: center;
       gap: 15px;
-      color: #e9edef;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #my-number:hover {
+      background: linear-gradient(135deg, var(--border-color), var(--background-tertiary));
+      transform: translateX(5px);
+    }
+
+    #my-number::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(37, 211, 102, 0.1), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.6s ease;
+    }
+
+    #my-number:hover::before {
+      transform: translateX(100%);
+    }
+
+    .user-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      box-shadow: var(--shadow-medium);
+      position: relative;
+      transition: var(--transition);
+    }
+
+    .user-avatar:hover {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .user-avatar::after {
+      content: '';
+      position: absolute;
+      bottom: 3px;
+      right: 3px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--success-color);
+      border: 3px solid var(--background-dark);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .user-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .user-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .user-status {
+      font-size: 13px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .user-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .action-btn {
+      background: rgba(37, 211, 102, 0.15);
+      color: var(--primary-color);
+      border: 1px solid rgba(37, 211, 102, 0.3);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .action-btn:hover {
+      background: var(--primary-color);
+      color: white;
+      transform: scale(1.1) rotate(180deg);
+    }
+
+    .action-btn.delete-mode {
+      background: rgba(229, 62, 62, 0.15);
+      color: var(--danger-color);
+      border-color: rgba(229, 62, 62, 0.3);
+    }
+
+    .action-btn.delete-mode:hover {
+      background: var(--danger-color);
+      color: white;
+    }
+
+    .action-btn.active {
+      background: var(--danger-color);
+      color: white;
+      animation: shake 0.5s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    /* ===================== LISTE CONTACTS ===================== */
+    
+    #phone-list {
+      flex: 1;
+      overflow-y: auto;
+      background: var(--background-dark);
+    }
+
+    .contact-item {
+      padding: 20px 25px;
+      border-bottom: 1px solid rgba(42, 57, 66, 0.3);
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      color: var(--text-primary);
       position: relative;
       overflow: hidden;
     }
@@ -319,21 +547,20 @@
 
     .contact-item:hover {
       background: linear-gradient(135deg, rgba(42, 57, 66, 0.8), rgba(59, 74, 84, 0.6));
-      transform: translateX(4px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      transform: translateX(8px);
+      box-shadow: var(--shadow-medium);
     }
 
     .contact-item.active {
-      background: linear-gradient(135deg, #25d366, #128c7e);
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
       color: white;
       transform: translateX(0);
-      box-shadow: 0 6px 20px rgba(37, 211, 102, 0.3);
+      box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
     }
 
-    /* Avatar des contacts avec gradient */
     .contact-avatar {
-      width: 55px;
-      height: 55px;
+      width: 65px;
+      height: 65px;
       border-radius: 50%;
       background: linear-gradient(135deg, #667eea, #764ba2);
       display: flex;
@@ -341,51 +568,50 @@
       justify-content: center;
       color: white;
       font-weight: bold;
-      font-size: 22px;
+      font-size: 26px;
       flex-shrink: 0;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      transition: all 0.3s ease;
+      box-shadow: var(--shadow-medium);
+      transition: var(--transition);
       position: relative;
     }
 
     .contact-item:hover .contact-avatar {
-      transform: scale(1.1);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+      transform: scale(1.1) rotate(5deg);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
     }
 
-    /* Couleurs d'avatar variées */
-    .contact-item:nth-child(1) .contact-avatar { background: linear-gradient(135deg, #FF6B6B, #FF8E53); }
-    .contact-item:nth-child(2) .contact-avatar { background: linear-gradient(135deg, #4ECDC4, #44A08D); }
-    .contact-item:nth-child(3) .contact-avatar { background: linear-gradient(135deg, #45B7D1, #96C93D); }
-    .contact-item:nth-child(4) .contact-avatar { background: linear-gradient(135deg, #F093FB, #F5576C); }
-    .contact-item:nth-child(5) .contact-avatar { background: linear-gradient(135deg, #4FACFE, #00F2FE); }
-    .contact-item:nth-child(6) .contact-avatar { background: linear-gradient(135deg, #43E97B, #38F9D7); }
+    /* Couleurs d'avatars variées */
+    .contact-item:nth-child(odd) .contact-avatar { background: linear-gradient(135deg, #FF6B6B, #FF8E53); }
+    .contact-item:nth-child(even) .contact-avatar { background: linear-gradient(135deg, #4ECDC4, #44A08D); }
+    .contact-item:nth-child(3n) .contact-avatar { background: linear-gradient(135deg, #45B7D1, #96C93D); }
+    .contact-item:nth-child(4n) .contact-avatar { background: linear-gradient(135deg, #F093FB, #F5576C); }
+    .contact-item:nth-child(5n) .contact-avatar { background: linear-gradient(135deg, #4FACFE, #00F2FE); }
+    .contact-item:nth-child(6n) .contact-avatar { background: linear-gradient(135deg, #43E97B, #38F9D7); }
 
-    /* Indicateur de statut en ligne */
     .contact-avatar::after {
       content: '';
       position: absolute;
       bottom: 2px;
       right: 2px;
-      width: 14px;
-      height: 14px;
+      width: 16px;
+      height: 16px;
       border-radius: 50%;
-      background: #25d366;
-      border: 2px solid #111b21;
+      background: var(--success-color);
+      border: 3px solid var(--background-dark);
       opacity: 0;
       transition: opacity 0.3s ease;
     }
 
     .contact-item.online .contact-avatar::after {
       opacity: 1;
+      animation: pulse 2s infinite;
     }
 
-    /* Informations du contact */
     .contact-info {
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 6px;
       min-width: 0;
     }
 
@@ -393,13 +619,13 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
 
     .contact-name {
       font-weight: 600;
-      font-size: 16px;
-      color: #e9edef;
+      font-size: 17px;
+      color: var(--text-primary);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -411,40 +637,31 @@
 
     .contact-time {
       font-size: 12px;
-      color: #8696a0;
+      color: var(--text-secondary);
       white-space: nowrap;
-      margin-left: 8px;
+      margin-left: 10px;
     }
 
     .contact-item.active .contact-time {
       color: rgba(255, 255, 255, 0.8);
     }
 
-    /* Ligne du dernier message */
     .contact-message-line {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
       min-width: 0;
     }
 
     .message-status {
       flex-shrink: 0;
       font-size: 16px;
-      margin-right: 4px;
+      margin-right: 6px;
     }
 
-    .message-status.sent {
-      color: #8696a0;
-    }
-
-    .message-status.delivered {
-      color: #8696a0;
-    }
-
-    .message-status.read {
-      color: #25d366;
-    }
+    .message-status.sent { color: var(--text-secondary); }
+    .message-status.delivered { color: var(--text-secondary); }
+    .message-status.read { color: var(--success-color); }
 
     .contact-item.active .message-status {
       color: rgba(255, 255, 255, 0.8);
@@ -452,7 +669,7 @@
 
     .contact-last-message {
       font-size: 14px;
-      color: #8696a0;
+      color: var(--text-secondary);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -463,52 +680,46 @@
       color: rgba(255, 255, 255, 0.8);
     }
 
-    /* Badge de notification */
     .notification-badge {
-      background: linear-gradient(135deg, #25d366, #128c7e);
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
       color: white;
-      border-radius: 12px;
-      padding: 2px 8px;
+      border-radius: 15px;
+      padding: 4px 10px;
       font-size: 11px;
       font-weight: bold;
-      min-width: 20px;
+      min-width: 24px;
       text-align: center;
-      box-shadow: 0 2px 8px rgba(37, 211, 102, 0.4);
+      box-shadow: 0 4px 12px rgba(37, 211, 102, 0.5);
       animation: pulse 2s infinite;
-      margin-left: 8px;
+      margin-left: 10px;
     }
 
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
-    }
-
-    /* Zone de chat */
+    /* ===================== ZONE CHAT ===================== */
+    
     #chat-page {
       flex: 1;
       display: flex;
       flex-direction: column;
-      background-color: #0b141a;
+      background: var(--background-chat);
+      transition: var(--transition);
     }
 
     .chat-header {
-      background: linear-gradient(135deg, #202c33, #2a3942);
-      color: #e9edef;
-      padding: 16px 20px;
+      background: linear-gradient(135deg, var(--background-secondary), var(--background-tertiary));
+      color: var(--text-primary);
+      padding: 20px 25px;
       font-weight: 500;
-      border-bottom: 1px solid #2a3942;
+      border-bottom: 1px solid var(--border-color);
       display: flex;
       align-items: center;
-      gap: 12px;
-      font-size: 16px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      gap: 15px;
+      font-size: 17px;
+      box-shadow: var(--shadow-light);
     }
 
-    .chat-header::before {
-      content: '';
-      width: 45px;
-      height: 45px;
+    .chat-avatar {
+      width: 50px;
+      height: 50px;
       border-radius: 50%;
       background: linear-gradient(135deg, #667eea, #764ba2);
       display: flex;
@@ -516,84 +727,129 @@
       justify-content: center;
       color: white;
       font-weight: bold;
-      font-size: 20px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      font-size: 22px;
+      box-shadow: var(--shadow-medium);
     }
 
-    #back-button {
-      background: linear-gradient(135deg, #25d366, #128c7e);
+    .chat-contact-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .chat-contact-name {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .chat-contact-status {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .chat-actions {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .chat-action-btn {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
       color: white;
       border: none;
-      padding: 8px 16px;
-      border-radius: 20px;
+      padding: 10px 20px;
+      border-radius: 25px;
       cursor: pointer;
-      font-size: 12px;
-      margin-left: auto;
-      transition: all 0.3s ease;
+      font-size: 13px;
+      transition: var(--transition);
+      font-weight: 500;
     }
 
-    #back-button:hover {
+    .chat-action-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(37, 211, 102, 0.3);
+      box-shadow: 0 8px 20px rgba(37, 211, 102, 0.4);
     }
 
-    /* Messages */
+    .chat-action-btn.back-btn {
+      background: linear-gradient(135deg, var(--border-color), var(--background-tertiary));
+    }
+
+    .chat-action-btn.back-btn:hover {
+      box-shadow: 0 8px 20px rgba(59, 74, 84, 0.4);
+    }
+
+    /* ===================== MESSAGES ===================== */
+    
     #chat-box {
       flex: 1;
       overflow-y: auto;
-      padding: 20px;
-      background-color: #0b141a;
+      padding: 25px;
+      background: var(--background-chat);
       background-image: 
         radial-gradient(circle at 25% 25%, rgba(255,255,255,0.02) 1px, transparent 1px),
         radial-gradient(circle at 75% 75%, rgba(255,255,255,0.02) 1px, transparent 1px);
-      background-size: 40px 40px;
+      background-size: 50px 50px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 12px;
     }
 
     .message {
-      max-width: 70%;
-      padding: 10px 14px;
-      margin-bottom: 8px;
-      border-radius: 12px;
+      max-width: 75%;
+      padding: 12px 18px;
+      margin-bottom: 10px;
+      border-radius: 15px;
       font-size: 14px;
-      line-height: 1.4;
+      line-height: 1.5;
       position: relative;
       word-wrap: break-word;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-      transition: all 0.3s ease;
+      box-shadow: var(--shadow-light);
+      transition: var(--transition);
+      animation: messageSlideIn 0.3s ease-out;
+    }
+
+    @keyframes messageSlideIn {
+      from { 
+        opacity: 0; 
+        transform: translateY(20px) scale(0.95); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0) scale(1); 
+      }
     }
 
     .message:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-medium);
     }
 
     .message.sent {
       align-self: flex-end;
-      background: linear-gradient(135deg, #005c4b, #128c7e);
-      color: #e9edef;
-      border-bottom-right-radius: 4px;
+      background: linear-gradient(135deg, #005c4b, var(--primary-dark));
+      color: var(--text-primary);
+      border-bottom-right-radius: 5px;
     }
 
     .message.received {
       align-self: flex-start;
-      background: linear-gradient(135deg, #202c33, #2a3942);
-      color: #e9edef;
-      border-bottom-left-radius: 4px;
+      background: linear-gradient(135deg, var(--background-secondary), var(--background-tertiary));
+      color: var(--text-primary);
+      border-bottom-left-radius: 5px;
     }
 
     .message .timestamp {
       font-size: 11px;
       color: rgba(255, 255, 255, 0.6);
       align-self: flex-end;
-      margin-top: 4px;
+      margin-top: 6px;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
     }
 
     .message.received .timestamp {
@@ -601,210 +857,243 @@
       color: rgba(255, 255, 255, 0.5);
     }
 
-    /* Indicateurs de statut des messages */
     .message-status-indicator {
       font-size: 16px;
-      margin-left: 4px;
+      margin-left: 6px;
     }
 
-    .message-status-indicator.sent {
-      color: #8696a0;
+    .message-status-indicator.sent { color: var(--text-secondary); }
+    .message-status-indicator.delivered { color: var(--text-secondary); }
+    .message-status-indicator.read { color: var(--success-color); }
+
+    .message img, .message video {
+      max-width: 100%;
+      border-radius: 12px;
+      margin-top: 6px;
+      box-shadow: var(--shadow-medium);
     }
 
-    .message-status-indicator.delivered {
-      color: #8696a0;
+    .message audio {
+      margin-top: 6px;
+      width: 100%;
     }
 
-    .message-status-indicator.read {
-      color: #25d366;
+    .delete-btn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: rgba(229, 62, 62, 0.9);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      font-size: 12px;
+      opacity: 0;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    /* Zone d'envoi */
+    .message:hover .delete-btn {
+      opacity: 1;
+    }
+
+    .delete-btn:hover {
+      transform: scale(1.2);
+      background: var(--danger-color);
+    }
+
+    /* ===================== INDICATEUR DE FRAPPE ===================== */
+    
+    .typing-indicator {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 15px 25px;
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-style: italic;
+    }
+
+    .typing-indicator.show {
+      display: flex;
+    }
+
+    .typing-dots {
+      display: flex;
+      gap: 4px;
+    }
+
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text-secondary);
+      animation: typingBounce 1.4s infinite;
+    }
+
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typingBounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-10px); }
+    }
+
+    /* ===================== ZONE SAISIE ===================== */
+    
     .input-container {
       display: flex;
       align-items: center;
-      padding: 16px 20px;
-      background: linear-gradient(135deg, #202c33, #2a3942);
+      padding: 20px 25px;
+      background: linear-gradient(135deg, var(--background-secondary), var(--background-tertiary));
+      gap: 15px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .media-buttons {
+      display: flex;
       gap: 12px;
+    }
+
+    .media-btn {
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      padding: 10px;
+      border-radius: 50%;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .media-btn:hover {
+      background: rgba(37, 211, 102, 0.15);
+      color: var(--primary-color);
+      transform: scale(1.2) rotate(15deg);
     }
 
     #chat-input {
       flex: 1;
-      padding: 12px 20px;
-      border-radius: 25px;
+      padding: 15px 25px;
+      border-radius: 30px;
       border: none;
       font-size: 15px;
       outline: none;
-      background-color: #3b4a54;
-      color: #e9edef;
-      transition: all 0.3s ease;
+      background: var(--border-color);
+      color: var(--text-primary);
+      transition: var(--transition);
     }
 
     #chat-input:focus {
-      background-color: #4a5d6a;
-      box-shadow: 0 0 0 2px rgba(37, 211, 102, 0.3);
+      background: var(--border-color);
+      transform: scale(1.02);
+      box-shadow: 0 0 0 2px rgba(37, 211, 102, 0.4);
     }
 
     #chat-input::placeholder {
-      color: #8696a0;
+      color: var(--text-secondary);
     }
 
     #send-btn {
-      width: 50px;
-      height: 50px;
-      background: linear-gradient(135deg, #25d366, #128c7e);
-      color: #fff;
+      width: 55px;
+      height: 55px;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      color: white;
       border: none;
       border-radius: 50%;
       cursor: pointer;
-      font-size: 20px;
+      font-size: 22px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+      transition: var(--transition);
+      box-shadow: var(--shadow-medium);
     }
 
     #send-btn:hover {
-      transform: scale(1.1);
-      box-shadow: 0 6px 16px rgba(37, 211, 102, 0.4);
+      transform: scale(1.15) rotate(45deg);
+      box-shadow: 0 10px 25px rgba(37, 211, 102, 0.6);
     }
 
-    .image-label, .video-label {
-      font-size: 24px;
-      cursor: pointer;
-      color: #8696a0;
-      padding: 8px;
-      border-radius: 50%;
-      transition: all 0.3s ease;
+    #send-btn:active {
+      transform: scale(0.95);
     }
 
-    .image-label:hover, .video-label:hover {
-      background-color: rgba(37, 211, 102, 0.1);
-      color: #25d366;
-      transform: scale(1.1);
-    }
-
-    /* Sections audio et appel */
+    /* ===================== CONTRÔLES AUDIO/APPEL ===================== */
+    
     .audio-container, .call-container {
-      padding: 12px 16px;
+      padding: 15px 20px;
       text-align: center;
-      background-color: #202c33;
-      border-top: 1px solid #2a3942;
+      background: linear-gradient(135deg, var(--background-secondary), var(--background-tertiary));
+      border-top: 1px solid var(--border-color);
     }
 
     .audio-container h3, .call-container h3 {
-      color: #e9edef;
-      margin-bottom: 12px;
+      color: var(--text-primary);
+      margin-bottom: 15px;
       font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .control-btn {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+      margin: 6px;
+      font-size: 12px;
+      transition: var(--transition);
       font-weight: 500;
     }
 
-    .audio-container button, .call-container button {
-      background-color: #25d366;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 15px;
-      cursor: pointer;
-      margin: 4px;
-      font-size: 12px;
-      transition: all 0.3s ease;
-    }
-
-    .audio-container button:hover, .call-container button:hover {
-      background-color: #1ebe5a;
+    .control-btn:hover {
       transform: translateY(-2px);
+      box-shadow: var(--shadow-medium);
     }
 
-    .audio-container button:disabled {
-      background-color: #3b4a54;
-      color: #8696a0;
+    .control-btn:disabled {
+      background: var(--border-color);
+      color: var(--text-secondary);
+      transform: none;
+      box-shadow: none;
+      cursor: not-allowed;
     }
 
-    #hangup-btn {
-      background-color: #e53e3e !important;
+    .control-btn.danger {
+      background: linear-gradient(135deg, var(--danger-color), #c53030);
     }
 
-    #hangup-btn:hover {
-      background-color: #c53030 !important;
+    .control-btn.danger:hover {
+      box-shadow: 0 6px 20px rgba(229, 62, 62, 0.4);
     }
 
     .connection-info {
-      background-color: #2a3942;
-      color: #e9edef;
-      border: 1px solid #3b4a54;
-      padding: 8px 12px;
-      border-radius: 8px;
-      margin: 8px 0;
+      background: rgba(42, 57, 66, 0.8);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      padding: 12px 16px;
+      border-radius: var(--border-radius);
+      margin: 10px 0;
       font-size: 12px;
-    }
-
-    #copy-call-id {
-      background-color: #25d366 !important;
-      color: white;
-      border: none;
-      padding: 4px 8px;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 10px;
-      margin-left: 8px;
-    }
-
-    /* Pied de page caché */
-    .footer {
-      display: none;
-    }
-
-    /* Publicité */
-    .publicite {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, #128c7e, #25d366);
-      color: white;
+      backdrop-filter: blur(10px);
       display: flex;
-      flex-direction: column;
-      justify-content: center;
       align-items: center;
-      text-align: center;
-      z-index: 1000;
+      justify-content: space-between;
     }
 
-    .publicite h1 {
-      font-size: 2.5rem;
-      margin-bottom: 20px;
-      font-weight: 300;
-    }
-
-    .publicite p {
-      font-size: 1.2rem;
-      margin-bottom: 30px;
-      font-weight: 300;
-    }
-
-    .publicite button {
-      background-color: white;
-      color: #128c7e;
-      border: none;
-      padding: 12px 24px;
-      font-size: 1rem;
-      border-radius: 25px;
-      cursor: pointer;
-      transition: all 0.3s;
-      font-weight: 500;
-    }
-
-    .publicite button:hover {
-      background-color: #f0f0f0;
-      transform: translateY(-2px);
-    }
-
-    /* Scrollbar personnalisée */
+    /* ===================== SCROLLBAR ===================== */
+    
     ::-webkit-scrollbar {
-      width: 6px;
+      width: 8px;
     }
 
     ::-webkit-scrollbar-track {
@@ -812,141 +1101,320 @@
     }
 
     ::-webkit-scrollbar-thumb {
-      background: linear-gradient(135deg, #25d366, #128c7e);
-      border-radius: 3px;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      border-radius: 4px;
     }
 
     ::-webkit-scrollbar-thumb:hover {
-      background: linear-gradient(135deg, #128c7e, #25d366);
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
     }
 
-    /* Animations */
-    @keyframes blink {
-      0% { opacity: 1; }
-      50% { opacity: 0.5; }
-      100% { opacity: 1; }
-    }
-
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-
-    /* Responsive */
+    /* ===================== RESPONSIVE ===================== */
+    
     @media (max-width: 768px) {
       .chat-container {
         height: 100vh;
         border-radius: 0;
+        max-width: 100%;
       }
       
       #contacts-page {
         width: 100%;
+        position: absolute;
+        z-index: 10;
+        height: 100%;
+        transform: translateX(0);
       }
 
-      #contacts-page:not(.hidden) ~ #chat-page {
-        display: none;
+      #contacts-page.hidden {
+        transform: translateX(-100%);
       }
       
-      #chat-page.active ~ #contacts-page {
-        display: none;
+      #chat-page {
+        width: 100%;
+        height: 100%;
       }
+
+      .contact-item {
+        padding: 15px 20px;
+      }
+
+      .message {
+        max-width: 85%;
+      }
+
+      .input-container {
+        padding: 15px 20px;
+      }
+      
+      .call-overlay .call-avatar-large {
+        width: 180px;
+        height: 180px;
+        font-size: 70px;
+      }
+      
+      .call-controls {
+        gap: 30px;
+      }
+      
+      .call-btn-large {
+        width: 65px;
+        height: 65px;
+        font-size: 28px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .contacts-header {
+        font-size: 18px;
+        padding: 20px;
+      }
+
+      .user-avatar {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+      }
+
+      .contact-avatar {
+        width: 55px;
+        height: 55px;
+        font-size: 22px;
+      }
+
+      .chat-header {
+        font-size: 16px;
+        padding: 15px 20px;
+      }
+
+      .message {
+        font-size: 13px;
+        padding: 10px 14px;
+      }
+
+      #chat-input {
+        font-size: 14px;
+        padding: 12px 20px;
+      }
+
+      #send-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+      }
+
+      .media-btn {
+        font-size: 20px;
+        padding: 8px;
+      }
+    }
+
+    /* ===================== ACCESSIBILITÉ ===================== */
+    
+    .contact-item:focus,
+    .chat-action-btn:focus,
+    .action-btn:focus,
+    .media-btn:focus,
+    #chat-input:focus {
+      outline: 2px solid var(--primary-color);
+      outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Utilitaires */
+    .hidden {
+      display: none !important;
+    }
+
+    .invisible {
+      opacity: 0;
+      pointer-events: none;
     }
   </style>
 </head>
+
 <body>
-  <!-- Interface d'appel overlay -->
+  <!-- ===================== SPLASH SCREEN ===================== -->
+  <div class="splash-screen" id="splash-screen">
+    <div class="splash-logo">💬</div>
+    <div class="splash-text">WhatsApp Web</div>
+    <div class="splash-subtitle">Restez connecté avec vos proches où que vous soyez !</div>
+    <button class="splash-button" id="start-app">Commencer</button>
+  </div>
+
+  <!-- ===================== INTERFACE D'APPEL ===================== -->
   <div class="call-overlay" id="call-overlay">
     <div class="call-duration" id="call-duration">00:00</div>
+    
     <div class="call-header">
       <div class="call-status" id="call-status-text">Appel entrant...</div>
-      <div class="call-contact-name" id="call-contact-name">John Doe</div>
+      <div class="call-contact-name" id="call-contact-name">Contact</div>
       <div class="call-contact-number" id="call-contact-number">+33 6 12 34 56 78</div>
     </div>
     
-    <div class="call-avatar-large" id="call-avatar-large">J</div>
+    <div class="call-avatar-large" id="call-avatar-large">C</div>
     
     <div class="call-controls">
-      <button class="call-btn-large call-btn-decline" id="decline-call-btn" title="Raccrocher">📞</button>
-      <button class="call-btn-large call-btn-answer" id="answer-call-btn" title="Répondre">📞</button>
+      <button class="call-btn-large call-btn-decline" id="decline-call-btn" title="Raccrocher" aria-label="Raccrocher">
+        📞
+      </button>
+      <button class="call-btn-large call-btn-answer" id="answer-call-btn" title="Répondre" aria-label="Répondre">
+        📞
+      </button>
     </div>
   </div>
 
-  <!-- Titre Publicitaire -->
-  <div id="publicite" class="publicite">
-    <h1>🟢 WhatsApp Web</h1>
-    <p>Restez connecté avec vos proches où que vous soyez !</p>
-    <button id="fermer-publicite" aria-label="Fermer la publicité">Commencer</button>
-  </div>
-
-  <!-- Container principal WhatsApp -->
-  <div class="chat-container">
-    <!-- Page d'accueil : Liste des contacts (Sidebar) -->
+  <!-- ===================== CONTAINER PRINCIPAL ===================== -->
+  <div class="chat-container" id="main-container" style="display: none;">
+    
+    <!-- ===================== SIDEBAR CONTACTS ===================== -->
     <div id="contacts-page">
-      <section class="contacts-container">
-        <h3>💬 Discussions</h3>
-        
-        <!-- Barre de recherche -->
-        <div class="search-container">
-          <div class="search-box">
-            <span>🔍</span>
-            <input type="text" placeholder="Rechercher une discussion...">
+      <div class="contacts-header">
+        <span style="font-size: 24px;">💬</span>
+        Discussions
+      </div>
+      
+      <!-- Barre de recherche -->
+      <div class="search-container">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Rechercher une discussion..." id="search-input" aria-label="Rechercher un contact">
+        </div>
+      </div>
+      
+      <!-- Profil utilisateur -->
+      <div id="my-number">
+        <div class="user-avatar">👤</div>
+        <div class="user-info">
+          <div class="user-name" id="user-name">Votre numéro</div>
+          <div class="user-status">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--success-color); display: inline-block; animation: pulse 2s infinite;"></span>
+            En ligne
           </div>
         </div>
-        
-        <div id="phone-list">
-          <!-- Les contacts seront générés dynamiquement par societe.js -->
+        <div class="user-actions">
+          <button class="action-btn" id="add-name-btn" title="Modifier le nom" aria-label="Modifier le nom">+</button>
+          <button class="action-btn delete-mode" id="delete-mode-btn" title="Mode suppression" aria-label="Mode suppression">−</button>
         </div>
-      </section>
+      </div>
+      
+      <!-- Liste des contacts -->
+      <div id="phone-list" role="list" aria-label="Liste des contacts">
+        <!-- Les contacts seront générés dynamiquement -->
+      </div>
     </div>
 
-    <!-- Page de chat privé -->
+    <!-- ===================== ZONE CHAT ===================== -->
     <div id="chat-page" style="display: none;">
-      <div class="chat-area">
-        <header class="chat-header">
-          💬 Discussion
-          <span id="connection-status"></span>
-          <!-- Le numéro, le nom et d'autres informations seront ajoutés par societe.js -->
-        </header>
+      
+      <!-- En-tête du chat -->
+      <div class="chat-header">
+        <div class="chat-avatar" id="chat-avatar">C</div>
+        <div class="chat-contact-info">
+          <div class="chat-contact-name" id="chat-contact-name">Sélectionnez un contact</div>
+          <div class="chat-contact-status" id="chat-contact-status">Hors ligne</div>
+        </div>
+        <div class="chat-actions">
+          <button class="chat-action-btn" id="call-btn" aria-label="Passer un appel">📞 Appeler</button>
+          <button class="chat-action-btn back-btn" id="back-button" aria-label="Retour aux contacts">← Retour</button>
+        </div>
+      </div>
+      
+      <!-- Zone des messages -->
+      <div id="chat-box" role="log" aria-label="Messages de conversation" aria-live="polite">
+        <!-- Les messages apparaîtront ici -->
+      </div>
+
+      <!-- Indicateur de frappe -->
+      <div class="typing-indicator" id="typing-indicator" aria-label="Contact en train d'écrire">
+        <span>En train d'écrire</span>
+        <div class="typing-dots">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      </div>
+
+      <!-- Zone de saisie -->
+      <div class="input-container">
+        <div class="media-buttons">
+          <label for="image-input" class="media-btn" title="Envoyer une image" aria-label="Envoyer une image">📷</label>
+          <input type="file" id="image-input" accept="image/*" hidden aria-label="Sélectionner une image">
+          
+          <label for="video-input" class="media-btn" title="Envoyer une vidéo" aria-label="Envoyer une vidéo">📹</label>
+          <input type="file" id="video-input" accept="video/*" hidden aria-label="Sélectionner une vidéo">
+        </div>
         
-        <!-- Zone d'affichage des messages du chat -->
-        <main id="chat-box" class="chat-box"></main>
+        <input type="text" id="chat-input" placeholder="Tapez un message..." aria-label="Saisir un message" autocomplete="off">
+        
+        <button id="send-btn" aria-label="Envoyer le message" title="Envoyer">➤</button>
+      </div>
 
-        <!-- Zone d'envoi des messages texte, images et vidéos -->
-        <section class="input-container">
-          <label for="image-input" class="image-label" aria-label="Envoyer une image">📷</label>
-          <input type="file" id="image-input" accept="image/*" hidden>
-          <label for="video-input" class="video-label" aria-label="Envoyer une vidéo">📹</label>
-          <input type="file" id="video-input" accept="video/*" hidden>
-          <input type="text" id="chat-input" placeholder="Tapez un message..." aria-label="Entrer un message">
-          <button id="send-btn" aria-label="Envoyer le message">➤</button>
-        </section>
+      <!-- Contrôles audio -->
+      <div class="audio-container">
+        <h3>🎤 Message vocal</h3>
+        <button class="control-btn" id="record-btn" aria-label="Enregistrer un message audio">🎙️ Enregistrer</button>
+        <button class="control-btn" id="stop-btn" disabled aria-label="Arrêter l'enregistrement">⏹️ Arrêter</button>
+        <div id="audio-messages" aria-label="Messages audio"></div>
+      </div>
 
-        <!-- Zone d'enregistrement et d'envoi des messages audio -->
-        <section class="audio-container">
-          <h3>🎤 Message vocal</h3>
-          <button id="record-btn" aria-label="Enregistrer un message audio">🎙️ Enregistrer</button>
-          <button id="stop-btn" disabled aria-label="Arrêter l'enregistrement">⏹️ Arrêter</button>
-          <div id="audio-messages"></div>
-        </section>
-
-        <!-- Zone d'appel audio via WebRTC (appel et réponse) -->
-        <section class="call-container">
-          <h3>📞 Appel vocal</h3>
-          <div id="call-info" class="connection-info" style="display: none;">
-            ID d'appel: <span id="current-call-id"></span>
-            <button id="copy-call-id">📋 Copier</button>
-          </div>
-          <button id="call-btn" aria-label="Passer un appel">📲 Appeler</button>
-          <button id="answer-btn" aria-label="Répondre à l'appel">✅ Répondre</button>
-          <button id="hangup-btn" disabled aria-label="Terminer l'appel">❌ Terminer</button>
-          <audio id="remote-audio" controls autoplay></audio>
-        </section>
+      <!-- Contrôles d'appel -->
+      <div class="call-container">
+        <h3>📞 Appel vocal</h3>
+        <div id="call-info" class="connection-info" style="display: none;">
+          <span>ID d'appel: <span id="current-call-id"></span></span>
+          <button id="copy-call-id" class="control-btn" title="Copier l'ID d'appel">📋 Copier</button>
+        </div>
+        <button class="control-btn" id="answer-btn" aria-label="Répondre à un appel">✅ Répondre</button>
+        <button class="control-btn danger" id="hangup-btn" disabled aria-label="Terminer l'appel">❌ Terminer</button>
+        <audio id="remote-audio" controls autoplay style="width: 100%; margin-top: 10px;" aria-label="Audio de l'appel distant"></audio>
       </div>
     </div>
   </div>
 
+  <!-- ===================== JAVASCRIPT ===================== -->
+  <script type="module" src="societe.js" defer></script>
+  
   <script>
-    // Fonctions globales pour l'interface d'appel
+    // ===================== FONCTIONS GLOBALES =====================
+    
+    // Gestion du splash screen
+    document.addEventListener('DOMContentLoaded', function() {
+      const startBtn = document.getElementById('start-app');
+      const splashScreen = document.getElementById('splash-screen');
+      const mainContainer = document.getElementById('main-container');
+      
+      // Gestion du bouton start
+      if (startBtn) {
+        startBtn.addEventListener('click', function() {
+          splashScreen.classList.add('hidden');
+          setTimeout(() => {
+            if (mainContainer) {
+              mainContainer.style.display = 'flex';
+            }
+            splashScreen.style.display = 'none';
+          }, 500);
+        });
+      }
+      
+      // Auto-hide splash screen après 3 secondes
+      setTimeout(() => {
+        if (splashScreen && !splashScreen.classList.contains('hidden')) {
+          startBtn.click();
+        }
+      }, 3000);
+    });
+
+    // Fonctions globales pour l'interface d'appel (compatibilité)
     window.showCallInterface = function(contactName, contactNumber, isIncoming = true) {
       const overlay = document.getElementById('call-overlay');
       const statusText = document.getElementById('call-status-text');
@@ -954,228 +1422,63 @@
       const numberElement = document.getElementById('call-contact-number');
       const avatarElement = document.getElementById('call-avatar-large');
       const answerBtn = document.getElementById('answer-call-btn');
-      const declineBtn = document.getElementById('decline-call-btn');
+      
+      if (!overlay) return;
       
       overlay.classList.add('active');
-      nameElement.textContent = contactName;
-      numberElement.textContent = contactNumber;
-      avatarElement.textContent = contactName.charAt(0);
+      if (nameElement) nameElement.textContent = contactName;
+      if (numberElement) numberElement.textContent = contactNumber;
+      if (avatarElement) avatarElement.textContent = contactName.charAt(0);
       
       if (isIncoming) {
-        statusText.textContent = 'Appel entrant...';
-        answerBtn.style.display = 'flex';
+        if (statusText) statusText.textContent = 'Appel entrant...';
+        if (answerBtn) answerBtn.style.display = 'flex';
       } else {
-        statusText.textContent = 'Appel en cours...';
-        answerBtn.style.display = 'none';
+        if (statusText) statusText.textContent = 'Appel en cours...';
+        if (answerBtn) answerBtn.style.display = 'none';
       }
-      
-      // Simuler la durée d'appel
-      let duration = 0;
-      const durationElement = document.getElementById('call-duration');
-      const interval = setInterval(() => {
-        duration++;
-        const minutes = Math.floor(duration / 60).toString().padStart(2, '0');
-        const seconds = (duration % 60).toString().padStart(2, '0');
-        durationElement.textContent = `${minutes}:${seconds}`;
-      }, 1000);
-      
-      // Gestion des boutons
-      declineBtn.onclick = () => {
-        overlay.classList.remove('active');
-        clearInterval(interval);
-        if (window.endCall) window.endCall();
-      };
-      
-      answerBtn.onclick = () => {
-        statusText.textContent = 'Connecté';
-        answerBtn.style.display = 'none';
-        if (window.answerCall) window.answerCall();
-      };
-      
-      return interval;
     };
 
     window.hideCallInterface = function() {
-      document.getElementById('call-overlay').classList.remove('active');
-    };
-
-    // Script pour copier l'ID d'appel
-    document.getElementById('copy-call-id')?.addEventListener('click', function() {
-      const callIdElement = document.getElementById('current-call-id');
-      if (callIdElement) {
-        navigator.clipboard.writeText(callIdElement.textContent)
-          .then(() => {
-            // Notification style WhatsApp
-            const notification = document.createElement('div');
-            notification.textContent = 'ID copié !';
-            notification.style.cssText = `
-              position: fixed;
-              top: 20px;
-              right: 20px;
-              background: #25d366;
-              color: white;
-              padding: 8px 16px;
-              border-radius: 20px;
-              font-size: 14px;
-              z-index: 1000;
-              animation: slideIn 0.3s ease;
-            `;
-            document.body.appendChild(notification);
-            setTimeout(() => notification.remove(), 2000);
-          })
-          .catch(err => {
-            console.error('Erreur lors de la copie:', err);
-          });
-      }
-    });
-
-    // Cette fonction sera appelée depuis societe.js pour mettre à jour l'affichage de l'appel
-    window.updateCallDisplay = function(callId, status) {
-      const callInfo = document.getElementById('call-info');
-      const statusIndicator = document.getElementById('connection-status');
-      
-      if (callId && (status === 'waiting' || status === 'connected')) {
-        document.getElementById('current-call-id').textContent = callId;
-        callInfo.style.display = 'block';
-        
-        if (status === 'connected') {
-          statusIndicator.innerHTML = '<span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #25d366; margin-left: 8px;"></span>';
-        } else {
-          statusIndicator.innerHTML = '<span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: #FFC107; margin-left: 8px; animation: blink 1s infinite;"></span>';
-        }
-      } else {
-        callInfo.style.display = 'none';
-        statusIndicator.innerHTML = '';
+      const overlay = document.getElementById('call-overlay');
+      if (overlay) {
+        overlay.classList.remove('active');
       }
     };
 
-    // Fonction pour créer un contact avec le nouveau design
-    window.createContactElement = function(contactData) {
-      const { number, name, lastMessage, time, unreadCount, isOnline, messageStatus } = contactData;
-      
-      const contactItem = document.createElement("div");
-      contactItem.classList.add("contact-item");
-      if (isOnline) contactItem.classList.add("online");
-      contactItem.dataset.contactId = number;
-      
-      // Créer l'avatar
-      const avatar = document.createElement("div");
-      avatar.classList.add("contact-avatar");
-      avatar.textContent = (name || number).charAt(0).toUpperCase();
-      
-      // Créer les informations du contact
-      const contactInfo = document.createElement("div");
-      contactInfo.classList.add("contact-info");
-      
-      // Header avec nom et heure
-      const contactHeader = document.createElement("div");
-      contactHeader.classList.add("contact-header");
-      
-      const contactName = document.createElement("div");
-      contactName.classList.add("contact-name");
-      contactName.textContent = name || number;
-      
-      const contactTime = document.createElement("div");
-      contactTime.classList.add("contact-time");
-      contactTime.textContent = time || "";
-      
-      contactHeader.appendChild(contactName);
-      contactHeader.appendChild(contactTime);
-      
-      // Ligne du message avec statut
-      const messageLine = document.createElement("div");
-      messageLine.classList.add("contact-message-line");
-      
-      // Icône de statut du message
-      if (messageStatus) {
-        const statusIcon = document.createElement("div");
-        statusIcon.classList.add("message-status", messageStatus);
-        
-        switch (messageStatus) {
-          case 'sent':
-            statusIcon.textContent = '✓';
-            break;
-          case 'delivered':
-            statusIcon.textContent = '✓✓';
-            break;
-          case 'read':
-            statusIcon.textContent = '✓✓';
-            break;
-        }
-        
-        messageLine.appendChild(statusIcon);
-      }
-      
-      // Dernier message
-      const lastMsg = document.createElement("div");
-      lastMsg.classList.add("contact-last-message");
-      lastMsg.textContent = lastMessage || "Nouveau contact";
-      
-      messageLine.appendChild(lastMsg);
-      
-      // Badge de notification
-      if (unreadCount > 0) {
-        const badge = document.createElement("div");
-        badge.classList.add("notification-badge");
-        badge.textContent = unreadCount;
-        messageLine.appendChild(badge);
-      }
-      
-      // Assembler le tout
-      contactInfo.appendChild(contactHeader);
-      contactInfo.appendChild(messageLine);
-      
-      contactItem.appendChild(avatar);
-      contactItem.appendChild(contactInfo);
-      
-      return contactItem;
-    };
-
-    // Fonction pour mettre à jour le statut d'un message
-    window.updateMessageStatus = function(messageElement, status) {
-      const timestamp = messageElement.querySelector('.timestamp');
-      if (timestamp) {
-        // Supprimer l'ancien indicateur s'il existe
-        const oldIndicator = timestamp.querySelector('.message-status-indicator');
-        if (oldIndicator) {
-          oldIndicator.remove();
-        }
-        
-        // Ajouter le nouvel indicateur
-        const statusIndicator = document.createElement('span');
-        statusIndicator.classList.add('message-status-indicator', status);
-        
-        switch (status) {
-          case 'sent':
-            statusIndicator.textContent = '✓';
-            break;
-          case 'delivered':
-            statusIndicator.textContent = '✓✓';
-            break;
-          case 'read':
-            statusIndicator.textContent = '✓✓';
-            break;
-        }
-        
-        timestamp.appendChild(statusIndicator);
+    window.endCall = function() {
+      if (window.whatsappApp) {
+        window.whatsappApp.endCall();
       }
     };
 
-    // Enregistrement du Service Worker pour la PWA
+    window.answerCall = function() {
+      if (window.whatsappApp) {
+        window.whatsappApp.answerCall();
+      }
+    };
+
+    // Service Worker pour PWA
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js')
+      navigator.serviceWorker.register('/sw.js')
         .then(registration => {
-          console.log('Service Worker enregistré avec succès:', registration.scope);
+          console.log('✅ Service Worker enregistré:', registration.scope);
         })
         .catch(error => {
-          console.error("L'enregistrement du Service Worker a échoué:", error);
+          console.log('ℹ️ Service Worker non disponible');
         });
     }
 
-    // Script pour fermer la publicité
-    document.getElementById('fermer-publicite').addEventListener('click', function() {
-      document.getElementById('publicite').style.display = 'none';
+    // Gestion des erreurs globales
+    window.addEventListener('error', function(e) {
+      console.error('Erreur JavaScript:', e.error);
     });
+
+    window.addEventListener('unhandledrejection', function(e) {
+      console.error('Promise rejetée:', e.reason);
+    });
+
+    console.log('🎉 WhatsApp Web - Interface chargée avec succès!');
   </script>
 </body>
 </html>
